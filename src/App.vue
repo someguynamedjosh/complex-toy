@@ -1,5 +1,5 @@
 <template>
-<value-display/>
+  <value-display :value="{type: 'multiple', value: [{x: 0.0, y: 0.0}, {x: 1, y: 1}, {x:0,y:-1}]}" />
 </template>
 
 <script lang="ts">

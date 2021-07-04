@@ -3,18 +3,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import VueCanvas, { DrawEvent } from './VueCanvas.vue'
-
-class GridDrawer {
-  constructor (private event: CanvasRenderingContext2D, private divisionsPerWhole: number) {
-
-  }
-}
+import { Point, Value } from './Data'
 
 export default defineComponent({
   name: 'ValueDisplay',
   components: { VueCanvas },
+  props: {
+    value: {
+      type: Object as PropType<Value>,
+      required: true
+    }
+  },
   methods: {
     drawLine (event: DrawEvent, x1: number, y1: number, x2: number, y2: number) {
       const { ctx } = event
@@ -23,29 +24,36 @@ export default defineComponent({
       ctx.lineTo(x2, y2)
       ctx.stroke()
     },
-    draw (event: DrawEvent) {
+    drawGrid (event: DrawEvent, scale: number) {
       const { ctx, w, h } = event
+      // Compute some parameters.
       const cx = Math.floor(w / 2.0) + 0.5
       const cy = Math.floor(h / 2.0) + 0.5
 
-      ctx.strokeStyle = '#fff'
+      // Set up rendering mode
       ctx.lineWidth = 1
       ctx.globalCompositeOperation = 'lighten'
+      // Colors for different line weights
       const smallLineColor = '#222'
       const mediumLineColor = '#555'
       const largeLineColor = '#fff'
 
+      // Values we will use in rendering the lines.
       let [x, y] = [0, 0]
       let divisions = 0
       const divisionsPerWhole = 5
-      const edge = 2.25
-      const spacing = Math.min(w, h) / 2.0 / (edge * divisionsPerWhole)
+      const spacing = 1.0 / (scale * divisionsPerWhole)
 
       // Draw horizontal lines
       y = cy % spacing
       divisions = Math.floor((cy - y + 1.0) / spacing)
       while (y < h) {
-        ctx.strokeStyle = divisions % divisionsPerWhole === 0 ? mediumLineColor : smallLineColor
+        ctx.strokeStyle = smallLineColor
+        if (divisions % divisionsPerWhole === 0) {
+          ctx.strokeStyle = largeLineColor
+          this.drawLine(event, cx - spacing / 2, y, cx + spacing / 2, y)
+          ctx.strokeStyle = mediumLineColor
+        }
         if (divisions === 0) ctx.strokeStyle = largeLineColor
         this.drawLine(event, 0, y, w, y)
         divisions -= 1
@@ -55,11 +63,52 @@ export default defineComponent({
       x = cx % spacing
       divisions = Math.floor((x - cx + 1.0) / spacing)
       while (x < w) {
-        ctx.strokeStyle = divisions % divisionsPerWhole === 0 ? mediumLineColor : smallLineColor
+        ctx.strokeStyle = smallLineColor
+        if (divisions % divisionsPerWhole === 0) {
+          ctx.strokeStyle = largeLineColor
+          this.drawLine(event, x, cy - spacing / 2, x, cy + spacing / 2)
+          ctx.strokeStyle = mediumLineColor
+        }
         if (divisions === 0) ctx.strokeStyle = largeLineColor
         this.drawLine(event, x, 0, x, h)
         divisions += 1
         x += spacing
+      }
+    },
+    drawPoint (event: DrawEvent, point: Point, radius: number, scale: number) {
+      const { ctx, w, h } = event
+      const cx = Math.floor(w / 2.0) + 0.5
+      const cy = Math.floor(h / 2.0) + 0.5
+
+      ctx.beginPath()
+      ctx.ellipse(
+        cx + point.x / scale,
+        cy + point.y / scale,
+        radius,
+        radius,
+        0.0,
+        0.0,
+        Math.PI * 2.0
+      )
+      ctx.fill()
+    },
+    draw (event: DrawEvent) {
+      const { ctx, w, h } = event
+      const edge = 2.25
+      const scale = edge / (Math.min(w, h) / 2.0)
+
+      this.drawGrid(event, scale)
+
+      ctx.fillStyle = '#ff0'
+      ctx.globalCompositeOperation = 'source-over'
+      if (this.value.type === 'single') {
+        const radius = 0.1 / scale
+        this.drawPoint(event, this.value.value, radius, scale)
+      } else if (this.value.type === 'multiple') {
+        const radius = 0.04 / scale
+        for (const point of this.value.value) {
+          this.drawPoint(event, point, radius, scale)
+        }
       }
     }
   }
