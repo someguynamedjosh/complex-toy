@@ -1,6 +1,7 @@
 <template>
   <div id="value-editor-root">
     <div class="toolbar">
+      <span class="title">{{ title }}</span>
       <button @click="clear">clear</button>
       <span class="radioGroup">
         <button
@@ -29,6 +30,9 @@ import ValueDisplay, { GridMouseEvent } from './ValueDisplay.vue'
 export default defineComponent({
   name: 'ValueEditor',
   components: { ValueDisplay },
+  props: {
+    title: String
+  },
   data () {
     return {
       value: {
@@ -77,5 +81,10 @@ export default defineComponent({
   height: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
+}
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0 1rem;
 }
 </style>

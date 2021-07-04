@@ -1,5 +1,5 @@
 <template>
-  <value-editor />
+  <value-editor title="A" />
 </template>
 
 <script lang="ts">
@@ -23,6 +23,7 @@ html, body, #app {
   height: 100%;
   background: black;
   color: white;
+  font-family: sans;
 }
 button {
   border: none;

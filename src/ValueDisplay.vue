@@ -60,6 +60,7 @@ export default defineComponent({
       // Set up rendering mode
       ctx.lineWidth = 1
       ctx.globalCompositeOperation = 'lighten'
+      ctx.fillStyle = '#fff'
       // Colors for different line weights
       const smallLineColor = '#222'
       const mediumLineColor = '#555'
@@ -79,6 +80,9 @@ export default defineComponent({
         if (divisions % divisionsPerWhole === 0) {
           ctx.strokeStyle = largeLineColor
           this.drawLine(event, cx - spacing / 2, y, cx + spacing / 2, y)
+          ctx.font = '1.5rem sans'
+          const text = divisions === 0 ? '0' : `${divisions / divisionsPerWhole}i`
+          ctx.fillText(text, cx + 2.0, y - 5.0)
           ctx.strokeStyle = mediumLineColor
         }
         if (divisions === 0) ctx.strokeStyle = largeLineColor
@@ -102,19 +106,26 @@ export default defineComponent({
         x += spacing
       }
     },
+    translatePoint (event: DrawEvent, point: Point, scale: number): {x: number, y: number} {
+      const { ctx, w, h } = event
+      const cx = Math.floor(w / 2.0) + 0.5
+      const cy = Math.floor(h / 2.0) + 0.5
+      return {
+        x: cx + point.x / scale,
+        y: cy - point.y / scale
+      }
+    },
     drawPoint (event: DrawEvent, point: Point, radius: number, scale: number) {
       const { ctx, w, h } = event
       const cx = Math.floor(w / 2.0) + 0.5
       const cy = Math.floor(h / 2.0) + 0.5
+      const { x, y } = this.translatePoint(event, point, scale)
 
       ctx.beginPath()
       ctx.ellipse(
-        cx + point.x / scale,
-        cy - point.y / scale,
-        radius,
-        radius,
-        0.0,
-        0.0,
+        x, y,
+        radius, radius,
+        0.0, 0.0,
         Math.PI * 2.0
       )
       ctx.fill()
