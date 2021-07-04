@@ -1,11 +1,22 @@
 <template>
-  <vue-canvas @draw="draw" />
+  <vue-canvas
+    @draw="draw"
+    @mousedown="forwardMouseEvent"
+    @mouseup="forwardMouseEvent"
+    @mousemove="forwardMouseEvent"
+  />
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 import VueCanvas, { DrawEvent } from './VueCanvas.vue'
 import { Point, Value } from './Data'
+
+export interface GridMouseEvent {
+  x: number,
+  y: number,
+  mouseDown: boolean,
+}
 
 export default defineComponent({
   name: 'ValueDisplay',
@@ -16,7 +27,23 @@ export default defineComponent({
       required: true
     }
   },
+  data () {
+    return {
+      lastScale: 1.0,
+      lastCenter: [1, 1]
+    }
+  },
+  emits: {
+    /* eslint @typescript-eslint/no-unused-vars: 'off' */
+    mouse: (event: GridMouseEvent) => true
+  },
   methods: {
+    forwardMouseEvent (event: MouseEvent) {
+      const x = (event.clientX - this.lastCenter[0]) * this.lastScale
+      const y = -(event.clientY - this.lastCenter[1]) * this.lastScale
+      const mouseDown = event.buttons > 0
+      this.$emit('mouse', { x, y, mouseDown })
+    },
     drawLine (event: DrawEvent, x1: number, y1: number, x2: number, y2: number) {
       const { ctx } = event
       ctx.beginPath()
@@ -83,7 +110,7 @@ export default defineComponent({
       ctx.beginPath()
       ctx.ellipse(
         cx + point.x / scale,
-        cy + point.y / scale,
+        cy - point.y / scale,
         radius,
         radius,
         0.0,
@@ -96,6 +123,9 @@ export default defineComponent({
       const { ctx, w, h } = event
       const edge = 2.25
       const scale = edge / (Math.min(w, h) / 2.0)
+      this.lastScale = scale
+      const bounds = ctx.canvas.getBoundingClientRect()
+      this.lastCenter = [w / 2 + bounds.left, h / 2 + bounds.top]
 
       this.drawGrid(event, scale)
 
