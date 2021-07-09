@@ -41,7 +41,7 @@ export default defineComponent({
     "b"
     "result";
 }
-@media (min-aspect-ratio: 0.8) {
+@media (min-aspect-ratio: 4/4) {
   #the-main-part {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -50,7 +50,7 @@ export default defineComponent({
       "result result";
   }
 }
-@media (min-aspect-ratio: 2) {
+@media (min-aspect-ratio: 8/4) {
   #the-main-part {
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr;

@@ -27,7 +27,7 @@ type OpName =
   | 'subtraction'
   | 'multiplication'
   | 'division'
-  | 'power';
+  | 'exponentiation';
 
 interface Op {
   name: OpName;
@@ -52,13 +52,19 @@ function dooWop (op: OpName, val1: Point, val2: Point): Point {
     }
   } else if (op === 'division') {
     // https://mathworld.wolfram.com/ComplexDivision.html
-    const denominator = (val2.x * val2.x + val2.y * val2.y)
+    const denominator = val2.x * val2.x + val2.y * val2.y
     return {
       x: (val1.x * val2.x + val1.y * val2.y) / denominator,
       y: (val1.y * val2.x - val1.x * val2.y) / denominator
     }
+  } else if (op === 'exponentiation') {
+    const exponented = {
+      x: Math.exp(val2.x) * Math.cos(val2.y),
+      y: Math.exp(val2.x) * Math.sin(val2.y)
+    }
+    return dooWop('multiplication', val1, exponented)
   } else {
-    throw new Error('do it yourself')
+    throw new Error(`Unexpected op: ${op}`)
   }
 }
 
@@ -117,7 +123,7 @@ export default defineComponent({
         { name: 'subtraction', label: 'A-B' },
         { name: 'multiplication', label: 'A×B' },
         { name: 'division', label: 'A÷B' },
-        { name: 'power', label: 'Aᴮ' }
+        { name: 'exponentiation', label: 'A𝑒ᴮ' }
       ] as Array<Op>,
       modelValue: 'addition' as OpName
     }
