@@ -147,7 +147,10 @@ export default defineComponent({
         this.drawPoint(event, this.value.value, radius, scale)
       } else if (this.value.type === 'multiple') {
         const radius = 0.04 / scale
+        let hue = 10.0
         for (const point of this.value.value) {
+          ctx.fillStyle = `hsl(${hue}, 100%, 50%)`
+          hue += 0.8
           this.drawPoint(event, point, radius, scale)
         }
       }

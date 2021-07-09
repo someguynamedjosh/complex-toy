@@ -50,6 +50,13 @@ function dooWop (op: OpName, val1: Point, val2: Point): Point {
       x: val1.x * val2.x - val1.y * val2.y,
       y: val1.x * val2.y + val1.y * val2.x
     }
+  } else if (op === 'division') {
+    // https://mathworld.wolfram.com/ComplexDivision.html
+    const denominator = (val2.x * val2.x + val2.y * val2.y)
+    return {
+      x: (val1.x * val2.x + val1.y * val2.y) / denominator,
+      y: (val1.y * val2.x - val1.x * val2.y) / denominator
+    }
   } else {
     throw new Error('do it yourself')
   }
