@@ -2,17 +2,18 @@
   <div id="the-main-part">
     <value-editor id="a" title="A" />
     <value-editor id="b" title="B" />
-    <value-editor id="result" title="Result" />
+    <result-editor id="result" title="Result" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import ResultEditor from './ResultEditor.vue'
 import ValueEditor from './ValueEditor.vue'
 
 export default defineComponent({
   name: 'App',
-  components: { ValueEditor }
+  components: { ValueEditor, ResultEditor }
 })
 </script>
 
