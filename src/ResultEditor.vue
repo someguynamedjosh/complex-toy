@@ -1,7 +1,9 @@
 <template>
   <div class="value-editor-root">
     <div class="toolbar">
-      <span class="title">{{ ops.find(o => o.name === modelValue).label }}</span>
+      <span class="title">{{
+        ops.find((o) => o.name === modelValue).label
+      }}</span>
       <span class="radioGroup">
         <button
           v-for="op in ops"
@@ -27,7 +29,8 @@ type OpName =
   | 'subtraction'
   | 'multiplication'
   | 'division'
-  | 'exponentiation';
+  | 'exponentiation'
+  | 'twoexp';
 
 interface Op {
   name: OpName;
@@ -63,6 +66,9 @@ function dooWop (op: OpName, val1: Point, val2: Point): Point {
       y: Math.exp(val2.x) * Math.sin(val2.y)
     }
     return dooWop('multiplication', val1, exponented)
+  } else if (op === 'twoexp') {
+    const product = dooWop('multiplication', val1, val2)
+    return dooWop('exponentiation', { x: 1, y: 0 }, product)
   } else {
     throw new Error(`Unexpected op: ${op}`)
   }
@@ -122,7 +128,8 @@ export default defineComponent({
         { name: 'subtraction', label: 'A-B' },
         { name: 'multiplication', label: 'A×B' },
         { name: 'division', label: 'A÷B' },
-        { name: 'exponentiation', label: 'A𝑒ᴮ' }
+        { name: 'exponentiation', label: 'A𝑒ᴮ' },
+        { name: 'twoexp', label: '𝑒ᴬᴮ' }
       ] as Array<Op>,
       modelValue: 'addition' as OpName
     }
