@@ -1,14 +1,14 @@
 <template>
-  <value-editor title="A" />
+  <the-main-part />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import ValueEditor from './ValueEditor.vue'
+import TheMainPart from './TheMainPart.vue'
 
 export default defineComponent({
   name: 'App',
-  components: { ValueEditor }
+  components: { TheMainPart }
 })
 </script>
 
@@ -19,11 +19,12 @@ body {
   overflow: hidden;
 }
 html, body, #app {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background: black;
   color: white;
   font-family: sans;
+  overflow: hidden;
 }
 button {
   border: none;

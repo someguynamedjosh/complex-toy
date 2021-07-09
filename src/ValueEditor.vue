@@ -1,5 +1,5 @@
 <template>
-  <div id="value-editor-root">
+  <div class="value-editor-root">
     <div class="toolbar">
       <span class="title">{{ title }}</span>
       <button @click="clear">clear</button>
@@ -76,7 +76,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-#value-editor-root {
+.value-editor-root {
+  border: 1px solid #888;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
   display: grid;

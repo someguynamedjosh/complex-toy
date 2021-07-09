@@ -1,5 +1,7 @@
 <template>
-  <canvas ref="canvas" />
+  <div id="outer-box" ref="outerBox">
+    <canvas ref="canvas" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -20,6 +22,7 @@ export default defineComponent({
   setup () {
     return {
       canvas: ref<HTMLCanvasElement | null>(null),
+      outerBox: ref<HTMLElement | null>(null),
       context: null as CanvasRenderingContext2D | null,
       /* eslint @typescript-eslint/no-empty-function: 'off' */
       resizeListener: () => {},
@@ -42,9 +45,9 @@ export default defineComponent({
   },
   methods: {
     updateCanvasSize () {
-      if (this.canvas !== null) {
-        this.canvas.width = this.canvas.clientWidth
-        this.canvas.height = this.canvas.clientHeight
+      if (this.canvas !== null && this.outerBox !== null) {
+        this.canvas.width = this.outerBox.clientWidth
+        this.canvas.height = this.outerBox.clientHeight
       }
     },
     draw () {
@@ -70,7 +73,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 canvas {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+#outer-box {
+  position: relative;
 }
 </style>
