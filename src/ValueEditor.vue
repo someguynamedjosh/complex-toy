@@ -51,7 +51,7 @@ export default defineComponent({
         const { x, y } = event
         const oldPoints = this.modelValue.value
         this.$emit('update:modelValue', {
-          type: 'single',
+          type: 'multiple',
           value: [...oldPoints, { x, y }]
         })
       }
