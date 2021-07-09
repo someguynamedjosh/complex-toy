@@ -1,7 +1,7 @@
 <template>
   <div class="value-editor-root">
     <div class="toolbar">
-      <span class="title">{{ title }}</span>
+      <span class="title">{{ ops.find(o => o.name === modelValue).label }}</span>
       <span class="radioGroup">
         <button
           v-for="op in ops"
@@ -72,7 +72,6 @@ export default defineComponent({
   name: 'ValueEditor',
   components: { ValueDisplay },
   props: {
-    title: String,
     a: {
       type: Object as PropType<Value>,
       required: true
@@ -85,13 +84,13 @@ export default defineComponent({
   computed: {
     result (): Value {
       const aPoints = []
-      if (this.a.type === 'single') {
+      if (this.a.type === 'single' || this.a.type === 'vector') {
         aPoints.push(this.a.value)
       } else {
         aPoints.push(...this.a.value)
       }
       const bPoints = []
-      if (this.b.type === 'single') {
+      if (this.b.type === 'single' || this.b.type === 'vector') {
         bPoints.push(this.b.value)
       } else {
         bPoints.push(...this.b.value)
@@ -105,7 +104,7 @@ export default defineComponent({
 
       if (resultPoints.length === 1) {
         return {
-          type: 'single',
+          type: this.a.type as unknown as 'single' | 'vector',
           value: resultPoints[0]
         }
       } else {

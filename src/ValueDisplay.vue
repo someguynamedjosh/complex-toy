@@ -13,9 +13,9 @@ import VueCanvas, { DrawEvent } from './VueCanvas.vue'
 import { Point, Value } from './Data'
 
 export interface GridMouseEvent {
-  x: number,
-  y: number,
-  mouseDown: boolean,
+  x: number;
+  y: number;
+  mouseDown: boolean;
 }
 
 export default defineComponent({
@@ -81,7 +81,8 @@ export default defineComponent({
           ctx.strokeStyle = largeLineColor
           this.drawLine(event, cx - spacing / 2, y, cx + spacing / 2, y)
           ctx.font = '1.5rem sans'
-          const text = divisions === 0 ? '0' : `${divisions / divisionsPerWhole}i`
+          const text =
+            divisions === 0 ? '0' : `${divisions / divisionsPerWhole}i`
           ctx.fillText(text, cx + 2.0, y - 5.0)
           ctx.strokeStyle = mediumLineColor
         }
@@ -106,7 +107,11 @@ export default defineComponent({
         x += spacing
       }
     },
-    translatePoint (event: DrawEvent, point: Point, scale: number): {x: number, y: number} {
+    translatePoint (
+      event: DrawEvent,
+      point: Point,
+      scale: number
+    ): { x: number; y: number } {
       const { ctx, w, h } = event
       const cx = Math.floor(w / 2.0) + 0.5
       const cy = Math.floor(h / 2.0) + 0.5
@@ -122,12 +127,7 @@ export default defineComponent({
       const { x, y } = this.translatePoint(event, point, scale)
 
       ctx.beginPath()
-      ctx.ellipse(
-        x, y,
-        radius, radius,
-        0.0, 0.0,
-        Math.PI * 2.0
-      )
+      ctx.ellipse(x, y, radius, radius, 0.0, 0.0, Math.PI * 2.0)
       ctx.fill()
     },
     draw (event: DrawEvent) {
@@ -143,6 +143,26 @@ export default defineComponent({
       ctx.fillStyle = '#ff0'
       ctx.globalCompositeOperation = 'source-over'
       if (this.value.type === 'single') {
+        const radius = 0.1 / scale
+        this.drawPoint(event, this.value.value, radius, scale)
+      } else if (this.value.type === 'vector') {
+        const { x: x0, y: y0 } = this.translatePoint(event, { x: 0, y: 0 }, scale)
+        const { x, y } = this.translatePoint(event, this.value.value, scale)
+
+        ctx.lineWidth = 0.3 / scale
+        const angle = Math.atan2(y - y0, x - x0)
+        ctx.strokeStyle = '#D400A4'
+        ctx.beginPath()
+        ctx.arc(x0, y0, 0.4 / scale, 0.0, angle, angle < 0.0)
+        ctx.stroke()
+
+        ctx.lineWidth = 5
+        ctx.strokeStyle = '#0E76FF'
+        ctx.fillStyle = ctx.strokeStyle
+        ctx.beginPath()
+        ctx.moveTo(x0, y0)
+        ctx.lineTo(x, y)
+        ctx.stroke()
         const radius = 0.1 / scale
         this.drawPoint(event, this.value.value, radius, scale)
       } else if (this.value.type === 'multiple') {

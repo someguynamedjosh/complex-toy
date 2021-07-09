@@ -8,7 +8,13 @@
           :class="{ selected: modelValue.type === 'single' }"
           @click="makeSingle"
         >
-          single
+          dot
+        </button>
+        <button
+          :class="{ selected: modelValue.type === 'vector' }"
+          @click="makeVector"
+        >
+          arrow
         </button>
         <button
           :class="{ selected: modelValue.type === 'multiple' }"
@@ -41,10 +47,10 @@ export default defineComponent({
   methods: {
     onMouse (event: GridMouseEvent) {
       if (!event.mouseDown) return
-      if (this.modelValue.type === 'single') {
+      if (this.modelValue.type === 'single' || this.modelValue.type === 'vector') {
         const { x, y } = event
         this.$emit('update:modelValue', {
-          type: 'single',
+          type: this.modelValue.type,
           value: { x, y }
         })
       } else if (this.modelValue.type === 'multiple') {
@@ -66,7 +72,13 @@ export default defineComponent({
     makeSingle () {
       this.$emit('update:modelValue', {
         type: 'single',
-        value: { x: 0, y: 0 }
+        value: { x: 1, y: 0 }
+      })
+    },
+    makeVector () {
+      this.$emit('update:modelValue', {
+        type: 'vector',
+        value: { x: 0, y: 1 }
       })
     },
     makeMultiple () {
