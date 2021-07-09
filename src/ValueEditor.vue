@@ -5,25 +5,25 @@
       <button @click="clear">clear</button>
       <span class="radioGroup">
         <button
-          :class="{selected: value.type === 'single'}"
+          :class="{ selected: modelValue.type === 'single' }"
           @click="makeSingle"
         >
           single
         </button>
         <button
-          :class="{selected: value.type === 'multiple'}"
+          :class="{ selected: modelValue.type === 'multiple' }"
           @click="makeMultiple"
         >
           multiple
         </button>
       </span>
     </div>
-    <value-display :value="value" @mouse="onMouse" />
+    <value-display :value="modelValue" @mouse="onMouse" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { Value } from './Data'
 import ValueDisplay, { GridMouseEvent } from './ValueDisplay.vue'
 
@@ -31,45 +31,49 @@ export default defineComponent({
   name: 'ValueEditor',
   components: { ValueDisplay },
   props: {
-    title: String
-  },
-  data () {
-    return {
-      value: {
-        type: 'single',
-        value: { x: 0, y: 0 }
-      } as Value
+    title: String,
+    modelValue: {
+      type: Object as PropType<Value>,
+      required: true
     }
   },
+  emits: ['update:modelValue'],
   methods: {
     onMouse (event: GridMouseEvent) {
       if (!event.mouseDown) return
-      if (this.value.type === 'single') {
+      if (this.modelValue.type === 'single') {
         const { x, y } = event
-        this.value.value = { x, y }
-      } else if (this.value.type === 'multiple') {
+        this.$emit('update:modelValue', {
+          type: 'single',
+          value: { x, y }
+        })
+      } else if (this.modelValue.type === 'multiple') {
         const { x, y } = event
-        this.value.value.push({ x, y })
+        const oldPoints = this.modelValue.value
+        this.$emit('update:modelValue', {
+          type: 'single',
+          value: [...oldPoints, { x, y }]
+        })
       }
     },
     clear () {
-      if (this.value.type === 'single') {
+      if (this.modelValue.type === 'single') {
         this.makeSingle()
-      } else if (this.value.type === 'multiple') {
+      } else if (this.modelValue.type === 'multiple') {
         this.makeMultiple()
       }
     },
     makeSingle () {
-      this.value = {
+      this.$emit('update:modelValue', {
         type: 'single',
         value: { x: 0, y: 0 }
-      }
+      })
     },
     makeMultiple () {
-      this.value = {
+      this.$emit('update:modelValue', {
         type: 'multiple',
         value: []
-      }
+      })
     }
   }
 })

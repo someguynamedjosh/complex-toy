@@ -1,19 +1,32 @@
 <template>
   <div id="the-main-part">
-    <value-editor id="a" title="A" />
-    <value-editor id="b" title="B" />
+    <value-editor id="a" title="A" v-model="a" />
+    <value-editor id="b" title="B" v-model="b" />
     <result-editor id="result" title="Result" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { Value } from './Data'
 import ResultEditor from './ResultEditor.vue'
 import ValueEditor from './ValueEditor.vue'
 
 export default defineComponent({
   name: 'App',
-  components: { ValueEditor, ResultEditor }
+  components: { ValueEditor, ResultEditor },
+  data () {
+    return {
+      a: {
+        type: 'single',
+        value: { x: 0, y: 0 }
+      } as Value,
+      b: {
+        type: 'single',
+        value: { x: 0, y: 0 }
+      } as Value
+    }
+  }
 })
 </script>
 
