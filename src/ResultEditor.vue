@@ -13,12 +13,13 @@
         </button>
       </span>
     </div>
-    <value-display :value="value" @mouse="onMouse" />
+    <value-display :value="result" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
+import { Point, Value } from './Data'
 import ValueDisplay from './ValueDisplay.vue'
 
 type OpName =
@@ -33,11 +34,74 @@ interface Op {
   label: string;
 }
 
+function dooWop (op: OpName, val1: Point, val2: Point): Point {
+  if (op === 'addition') {
+    return {
+      x: val1.x + val2.x,
+      y: val1.y + val2.y
+    }
+  } else if (op === 'subtraction') {
+    return {
+      x: val1.x - val2.x,
+      y: val1.y - val2.y
+    }
+  } else if (op === 'multiplication') {
+    return {
+      x: val1.x * val2.x - val1.y * val2.y,
+      y: val1.x * val2.y + val1.y * val2.x
+    }
+  } else {
+    throw new Error('do it yourself')
+  }
+}
+
 export default defineComponent({
   name: 'ValueEditor',
   components: { ValueDisplay },
   props: {
-    title: String
+    title: String,
+    a: {
+      type: Object as PropType<Value>,
+      required: true
+    },
+    b: {
+      type: Object as PropType<Value>,
+      required: true
+    }
+  },
+  computed: {
+    result (): Value {
+      const aPoints = []
+      if (this.a.type === 'single') {
+        aPoints.push(this.a.value)
+      } else {
+        aPoints.push(...this.a.value)
+      }
+      const bPoints = []
+      if (this.b.type === 'single') {
+        bPoints.push(this.b.value)
+      } else {
+        bPoints.push(...this.b.value)
+      }
+      const resultPoints = []
+      for (const a of aPoints) {
+        for (const b of bPoints) {
+          resultPoints.push(dooWop(this.modelValue, a, b))
+        }
+      }
+
+      if (resultPoints.length === 1) {
+        return {
+          type: 'single',
+          value: resultPoints[0]
+        }
+      } else {
+        return {
+          type: 'multiple',
+          value: resultPoints
+        }
+      }
+    }
   },
   data () {
     return {

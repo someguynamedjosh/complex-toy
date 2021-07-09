@@ -2,7 +2,7 @@
   <div id="the-main-part">
     <value-editor id="a" title="A" v-model="a" />
     <value-editor id="b" title="B" v-model="b" />
-    <result-editor id="result" title="Result" />
+    <result-editor id="result" title="Result" :a="a" :b="b" />
   </div>
 </template>
 
