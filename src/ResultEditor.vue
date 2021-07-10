@@ -30,7 +30,8 @@ type OpName =
   | 'multiplication'
   | 'division'
   | 'exponentiation'
-  | 'twoexp';
+  | 'twoexp'
+  | 'addexp';
 
 interface Op {
   name: OpName;
@@ -68,6 +69,9 @@ function dooWop (op: OpName, val1: Point, val2: Point): Point {
     return dooWop('multiplication', val1, exponented)
   } else if (op === 'twoexp') {
     const product = dooWop('multiplication', val1, val2)
+    return dooWop('exponentiation', { x: 1, y: 0 }, product)
+  } else if (op === 'addexp') {
+    const product = dooWop('addition', val1, val2)
     return dooWop('exponentiation', { x: 1, y: 0 }, product)
   } else {
     throw new Error(`Unexpected op: ${op}`)
@@ -129,6 +133,7 @@ export default defineComponent({
         { name: 'multiplication', label: 'A×B' },
         { name: 'division', label: 'A÷B' },
         { name: 'exponentiation', label: 'A𝑒ᴮ' },
+        { name: 'addexp', label: '𝑒ᴬ⁺ᴮ' },
         { name: 'twoexp', label: '𝑒ᴬᴮ' }
       ] as Array<Op>,
       modelValue: 'addition' as OpName

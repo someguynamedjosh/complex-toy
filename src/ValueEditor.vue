@@ -28,8 +28,11 @@
         <option value="spin">Spin</option>
         <option value="wiggle">Wiggle</option>
         <option value="wobble">Wobble</option>
+        <option value="figure8">Figure 8</option>
         <option value="spin+wobble">Spin+Wobble</option>
+        <option value="spin+figure8">Spin+Figure 8</option>
         <option value="wiggle+wobble">Wiggle+Wobble</option>
+        <option value="wobble+figure8">Wobble+Figure 8</option>
       </select>
     </div>
     <value-display :value="modelValue" @mouse="onMouse" />
@@ -41,16 +44,10 @@ import { defineComponent, PropType } from 'vue'
 import { Point, Value } from './Data'
 import ValueDisplay, { GridMouseEvent } from './ValueDisplay.vue'
 
-type Animation =
-  | 'none'
-  | 'spin'
-  | 'wiggle'
-  | 'wobble'
-  | 'spin+wobble'
-  | 'wiggle+wobble';
+type Animation = string;
 
 function animTimer (): number {
-  return (Date.now() / 6000) % 1.0
+  return (Date.now() / 9000) % 1.0
 }
 
 function complexMul (a: Point, b: Point): Point {
@@ -94,13 +91,20 @@ export default defineComponent({
   },
   methods: {
     doAnimation () {
-      const last = this.lastTime
+      let last = this.lastTime
       const now = animTimer()
       if (this.modelValue.type === 'multiple') {
         this.animation = 'none'
       } else {
         let point = this.modelValue.value
         const TAU = Math.PI * 2.0
+        if (this.animation.includes('figure8')) {
+          last = 0.0
+          point = {
+            x: Math.cos(now * TAU * 1.0),
+            y: Math.sin(now * TAU * 2.0) / 2.0
+          }
+        }
         if (this.animation.includes('spin')) {
           const lastPhase = last * TAU
           const nowPhase = now * TAU
@@ -117,6 +121,7 @@ export default defineComponent({
         if (this.animation.includes('wobble')) {
           let speed = 2.0
           if (this.animation.includes('spin')) speed = 5.0
+          if (this.animation.includes('figure8')) speed = 6.0
           const scale = 0.3
           const lastAmplitude = Math.sin(speed * last * TAU) * scale + 1.0
           const nowAmplitude = Math.sin(speed * now * TAU) * scale + 1.0
