@@ -23,6 +23,14 @@
           multiple
         </button>
       </span>
+      <select v-model="animation" title="Animation" v-if="modelValue.type !== 'multiple'">
+        <option value="none">No Animation</option>
+        <option value="spin">Spin</option>
+        <option value="wiggle">Wiggle</option>
+        <option value="wobble">Wobble</option>
+        <option value="spin+wobble">Spin+Wobble</option>
+        <option value="wiggle+wobble">Wiggle+Wobble</option>
+      </select>
     </div>
     <value-display :value="modelValue" @mouse="onMouse" />
   </div>
@@ -30,8 +38,34 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { Value } from './Data'
+import { Point, Value } from './Data'
 import ValueDisplay, { GridMouseEvent } from './ValueDisplay.vue'
+
+type Animation =
+  | 'none'
+  | 'spin'
+  | 'wiggle'
+  | 'wobble'
+  | 'spin+wobble'
+  | 'wiggle+wobble';
+
+function animTimer (): number {
+  return (Date.now() / 6000) % 1.0
+}
+
+function complexMul (a: Point, b: Point): Point {
+  return {
+    x: a.x * b.x - a.y * b.y,
+    y: a.x * b.y + a.y * b.x
+  }
+}
+
+function euler (phase: number, amplitude: number): Point {
+  return {
+    x: amplitude * Math.cos(phase),
+    y: amplitude * Math.sin(phase)
+  }
+}
 
 export default defineComponent({
   name: 'ValueEditor',
@@ -44,10 +78,66 @@ export default defineComponent({
     }
   },
   emits: ['update:modelValue'],
+  data () {
+    return {
+      animation: 'spin' as Animation,
+      animate: false,
+      lastTime: animTimer()
+    }
+  },
+  mounted () {
+    this.animate = true
+    this.doAnimation()
+  },
+  unmounted () {
+    this.animate = false
+  },
   methods: {
+    doAnimation () {
+      const last = this.lastTime
+      const now = animTimer()
+      if (this.modelValue.type === 'multiple') {
+        this.animation = 'none'
+      } else {
+        let point = this.modelValue.value
+        const TAU = Math.PI * 2.0
+        if (this.animation.includes('spin')) {
+          const lastPhase = last * TAU
+          const nowPhase = now * TAU
+          point = complexMul(point, euler(nowPhase - lastPhase, 1.0))
+        }
+        if (this.animation.includes('wiggle')) {
+          const speed = 5.0
+          // if (this.animation.includes('wobble')) speed = 2.0
+          const scale = 0.3
+          const lastPhase = Math.sin(speed * last * TAU) * scale
+          const nowPhase = Math.sin(speed * now * TAU) * scale
+          point = complexMul(point, euler(nowPhase - lastPhase, 1.0))
+        }
+        if (this.animation.includes('wobble')) {
+          let speed = 2.0
+          if (this.animation.includes('spin')) speed = 5.0
+          const scale = 0.3
+          const lastAmplitude = Math.sin(speed * last * TAU) * scale + 1.0
+          const nowAmplitude = Math.sin(speed * now * TAU) * scale + 1.0
+          point = complexMul(point, euler(0.0, nowAmplitude / lastAmplitude))
+        }
+        this.$emit('update:modelValue', {
+          ...this.modelValue,
+          value: point
+        })
+      }
+      this.lastTime = now
+      if (this.animate) {
+        requestAnimationFrame(() => this.doAnimation())
+      }
+    },
     onMouse (event: GridMouseEvent) {
       if (!event.mouseDown) return
-      if (this.modelValue.type === 'single' || this.modelValue.type === 'vector') {
+      if (
+        this.modelValue.type === 'single' ||
+        this.modelValue.type === 'vector'
+      ) {
         const { x, y } = event
         this.$emit('update:modelValue', {
           type: this.modelValue.type,

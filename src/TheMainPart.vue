@@ -19,11 +19,11 @@ export default defineComponent({
     return {
       a: {
         type: 'single',
-        value: { x: 0, y: 0 }
+        value: { x: 1, y: 0 }
       } as Value,
       b: {
         type: 'single',
-        value: { x: 0, y: 0 }
+        value: { x: 1, y: 0 }
       } as Value
     }
   }
