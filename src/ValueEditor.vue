@@ -77,7 +77,7 @@ export default defineComponent({
   emits: ['update:modelValue'],
   data () {
     return {
-      animation: 'spin' as Animation,
+      animation: 'none' as Animation,
       animate: false,
       lastTime: animTimer()
     }
